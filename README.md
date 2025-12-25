@@ -1,6 +1,34 @@
 # API de Games
 Esta API é utilizada para ...
 ## Endpoints
+
+### Diagrama Geral
+Para facilitar a visualização do fluxo da API, o diagrama abaixo mostra a interação principal entre o usuário, a camada de autenticação e o serviço de jogos.
+
+```mermaid
+sequenceDiagram
+    actor Usuario
+    participant Navegador
+    participant API
+    participant Auth as Serviço de Autenticação
+    participant DB as Banco de Dados
+
+    Usuario->>Navegador: Acessa aplicação e envia requisição
+    Navegador->>API: Envia request para endpoint (ex.: /games)
+    API->>Auth: Valida token JWT
+    Auth-->>API: Token válido
+    API->>DB: Consulta jogos
+    DB-->>API: Retorna listagem
+    API-->>Navegador: Resposta em JSON com os games
+    Navegador-->>Usuario: Exibe resultado
+
+    alt Token inválido ou expirado
+        Auth-->>API: Erro de autenticação
+        API-->>Navegador: 401 { "err": "Token inválido!" }
+        Navegador-->>Usuario: Exibe erro na tela
+    end
+```
+
 ###  GET /games
 Esse endpoint é responsável por retornar a listagem de todos os games cadastradi no banco de dados.
 #### Parâmetros 
