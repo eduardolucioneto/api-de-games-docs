@@ -1,97 +1,38 @@
-# API de Games
-Esta API é utilizada para ...
-## Endpoints
-###  GET /games
-Esse endpoint é responsável por retornar a listagem de todos os games cadastradi no banco de dados.
-#### Parâmetros 
-Nenhum
-#### Respostas
-##### OK! 200
-Caso essa resposta aconteça você vai receber a listagem de todos os games.
-Exemplo de resposta:
-````
-[
-    {
-        "id": 23,
-        "title": "Call of duty MW",
-        "year": 2019,
-        "price": 60
-    },
-    {
-        "id": 65,
-        "title": "Sea of thieves",
-        "year": 2018,
-        "price": 40
-    },
-    {
-        "id": 2,
-        "title": "Minecraft",
-        "year": 2012,
-        "price": 20
-    }
-]
-````
-##### Falha na autenticação! 401
-Caso essa resposta aconteça, isso sigfnifica que houve alguma falha durante o processo de autenticaão da requisição. Motivos: Token inválido, Token expirado.
+# Interpretação de diagramas unifilares → Simulador de subestação
 
-Exemplo de resposta:
+Este repositório contém um protótipo completo que transforma um PDF de diagrama unifilar em um grafo elétrico e disponibiliza um simulador interativo de energização/fluxo. Inclui backend (FastAPI) com pipeline mock de detecção e frontend (Vite + TS) com canvas manipulável.
 
-```
-{
-    "err": "Token inválido!"
-}
+## Estrutura
+- `backend/`: API FastAPI, modelos Pydantic e motor de simulação.
+- `frontend/`: Vite (TypeScript) para o canvas interativo.
+- `docs/`: arquitetura detalhada, pipeline e limitações.
+- `examples/`: JSON de exemplo do grafo/layout.
+
+## Como rodar
+### Backend
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r backend/requirements.txt
+uvicorn backend.main:app --reload
 ```
 
-###  POST/auth
-Esse endpoint é responsável por fazer o processo de login.
-#### Parâmetros 
-
-email: E-mail do usuário cadastrado no sistema.
-
-passoword: Senha do usuário cadastrado no sistema, com aquele determinado e-mail.
-
-Exemplo: 
-
+### Frontend
+```bash
+cd frontend
+npm install
+npm run dev
 ```
-{
-    "email": "eduardolneto@gmail.com",
-    "password": "nodejs<3"
-}
+A interface espera o backend em `http://localhost:8000` e usa o modelo mock exposto em `/projects/mock/model`.
 
-```
-#### Respostas
-##### OK! 200
-Caso essa resposta aconteça você vai receber a listagem de todos os games.
-Exemplo de resposta:
-````
-[
-    {
-        "id": 23,
-        "title": "Call of duty MW",
-        "year": 2019,
-        "price": 60
-    },
-    {
-        "id": 65,
-        "title": "Sea of thieves",
-        "year": 2018,
-        "price": 40
-    },
-    {
-        "id": 2,
-        "title": "Minecraft",
-        "year": 2012,
-        "price": 20
-    }
-]
-````
-##### Falha na autenticação! 401
-Caso essa resposta aconteça, isso sigfnifica que houve alguma falha durante o processo de autenticaão da requisição. Motivos: Senha ou e-mail incorretos.
+## Endpoints principais
+- `POST /upload`: cria job de interpretação do PDF.
+- `GET /projects/{id}/status`: progresso do job.
+- `GET /projects/{id}/model`: retorna grafo e layout detectados.
+- `POST /projects/{id}/simulate`: roda simulação lógica com estados de chave fornecidos.
+- `GET /projects/mock/model`: modelo pronto para demonstração.
 
-Exemplo de resposta:
-
-```
-{
-    "err": "Credenciais inválidas!"
-}
+## Testes
+```bash
+pytest backend/tests
 ```
