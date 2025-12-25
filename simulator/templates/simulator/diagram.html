@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <title>Simulador de Subestação</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2.0.6/css/pico.min.css">
+    <link rel="stylesheet" href="{% static 'simulator/style.css' %}">
+</head>
+<body>
+<main class="container">
+    <h1>Simulador de Subestação</h1>
+    <p>Envie o diagrama unifilar em PDF para gerar uma topologia simulável.</p>
+
+    <section>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <fieldset>
+                <legend>Upload do diagrama</legend>
+                {{ form.as_p }}
+                <button type="submit">Processar PDF</button>
+            </fieldset>
+        </form>
+    </section>
+
+    {% if topology %}
+    <section>
+        <h2>Topologia interpretada</h2>
+        <p>Chaves detectadas a partir do diagrama enviado. Feche ou abra para simular energização.</p>
+        <div class="grid">
+            <div>
+                <h3>Chaves</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>De</th>
+                            <th>Para</th>
+                            <th>Estado</th>
+                            <th>Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for switch in topology.switches %}
+                        <tr>
+                            <td>{{ switch.id }}</td>
+                            <td>{{ switch.from }}</td>
+                            <td>{{ switch.to }}</td>
+                            <td>
+                                {% if switch.state == 'closed' %}
+                                    <span class="chip success">Fechada</span>
+                                {% else %}
+                                    <span class="chip secondary">Aberta</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a role="button" href="{% url 'toggle_switch' switch.id %}">
+                                    Alternar
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div>
+                <h3>Barras energizadas</h3>
+                <ul>
+                    {% for bus in energized %}
+                        <li>{{ bus }}</li>
+                    {% empty %}
+                        <li>Nenhuma barra energizada.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+</main>
+</body>
+</html>

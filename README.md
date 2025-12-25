@@ -1,97 +1,27 @@
-# API de Games
-Esta API é utilizada para ...
-## Endpoints
-###  GET /games
-Esse endpoint é responsável por retornar a listagem de todos os games cadastradi no banco de dados.
-#### Parâmetros 
-Nenhum
-#### Respostas
-##### OK! 200
-Caso essa resposta aconteça você vai receber a listagem de todos os games.
-Exemplo de resposta:
-````
-[
-    {
-        "id": 23,
-        "title": "Call of duty MW",
-        "year": 2019,
-        "price": 60
-    },
-    {
-        "id": 65,
-        "title": "Sea of thieves",
-        "year": 2018,
-        "price": 40
-    },
-    {
-        "id": 2,
-        "title": "Minecraft",
-        "year": 2012,
-        "price": 20
-    }
-]
-````
-##### Falha na autenticação! 401
-Caso essa resposta aconteça, isso sigfnifica que houve alguma falha durante o processo de autenticaão da requisição. Motivos: Token inválido, Token expirado.
+# Simulador de Subestação
 
-Exemplo de resposta:
+Aplicação Django para receber um diagrama unifilar em PDF de uma subestação de distribuição, interpretar suas chaves e permitir simulações de abertura/fechamento para visualizar barras energizadas.
 
-```
-{
-    "err": "Token inválido!"
-}
-```
+> Observação: a extração do PDF é um placeholder. O backend gera uma topologia demonstrativa para testes enquanto a lógica de interpretação real não é implementada.
 
-###  POST/auth
-Esse endpoint é responsável por fazer o processo de login.
-#### Parâmetros 
+## Requisitos
+- Python 3.11+
+- Dependências listadas em `requirements.txt` (`pip install -r requirements.txt`)
 
-email: E-mail do usuário cadastrado no sistema.
+## Como executar
+1. Crie e ative um ambiente virtual (opcional, porém recomendado).
+2. Instale as dependências: `pip install -r requirements.txt`.
+3. Aplique migrações padrão do Django: `python manage.py migrate`.
+4. Inicie o servidor: `python manage.py runserver 0.0.0.0:8000`.
+5. Acesse `http://localhost:8000` e envie um PDF para iniciar a simulação.
 
-passoword: Senha do usuário cadastrado no sistema, com aquele determinado e-mail.
+## Fluxo do simulador
+1. Envie um PDF do diagrama unifilar.
+2. O backend cria uma topologia simulável (chaves e barras) e a grava na sessão do usuário.
+3. Cada chave possui uma ação "Alternar" que abre ou fecha o circuito.
+4. A lista de barras energizadas é recalculada sempre que uma chave muda de estado.
 
-Exemplo: 
-
-```
-{
-    "email": "eduardolneto@gmail.com",
-    "password": "nodejs<3"
-}
-
-```
-#### Respostas
-##### OK! 200
-Caso essa resposta aconteça você vai receber a listagem de todos os games.
-Exemplo de resposta:
-````
-[
-    {
-        "id": 23,
-        "title": "Call of duty MW",
-        "year": 2019,
-        "price": 60
-    },
-    {
-        "id": 65,
-        "title": "Sea of thieves",
-        "year": 2018,
-        "price": 40
-    },
-    {
-        "id": 2,
-        "title": "Minecraft",
-        "year": 2012,
-        "price": 20
-    }
-]
-````
-##### Falha na autenticação! 401
-Caso essa resposta aconteça, isso sigfnifica que houve alguma falha durante o processo de autenticaão da requisição. Motivos: Senha ou e-mail incorretos.
-
-Exemplo de resposta:
-
-```
-{
-    "err": "Credenciais inválidas!"
-}
-```
+## Estrutura principal
+- `manage.py`: utilitário de linha de comando do Django.
+- `substation_site/`: configurações e roteamento do projeto.
+- `simulator/`: app com formulário de upload, parser placeholder e interface de simulação.

@@ -1,0 +1,21 @@
+body {
+    background: radial-gradient(circle at top left, #f3f6ff, #e6ebff 45%, #ffffff);
+}
+
+main {
+    margin-top: 2rem;
+}
+
+table {
+    width: 100%;
+}
+
+.chip.success {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.chip.secondary {
+    background: #e5e7eb;
+    color: #374151;
+}
