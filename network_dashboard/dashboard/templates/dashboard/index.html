@@ -1,0 +1,163 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br" class="dark">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gestor de Redes - Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-Fo3rlrZj/k7ujTTXRNp+QYgR9Z3e1x07XHtcwPa5RWPLXxF75E+0l62LF8A3BnQUwpsJtY8cmBHQYa1J5D2bZw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="{% static 'dashboard/styles.css' %}" />
+</head>
+<body>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fa-solid fa-network-wired"></i>
+                <span>Network Ops</span>
+            </div>
+            <nav>
+                <button class="nav-item active" data-section="alerts">
+                    <i class="fa-solid fa-bell"></i>
+                    <span>Alert Center</span>
+                </button>
+                <button class="nav-item" data-section="manuals">
+                    <i class="fa-solid fa-book"></i>
+                    <span>Knowledge Base</span>
+                </button>
+                <button class="nav-item" data-section="tasks">
+                    <i class="fa-solid fa-list-check"></i>
+                    <span>Daily Checklist</span>
+                </button>
+            </nav>
+            <div class="sidebar-footnote">
+                <p>Atalhos: <kbd>G</kbd> Buscar | <kbd>M</kbd> Manuais</p>
+            </div>
+        </aside>
+
+        <main class="content">
+            <header class="topbar">
+                <div class="global-search">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input id="globalSearch" type="search" placeholder="Busca global (Ctrl + K)" aria-label="Busca global" />
+                </div>
+                <div class="status-widget" aria-live="polite">
+                    <div>
+                        <p class="label">Status geral da rede</p>
+                        <p class="value">Operacional</p>
+                    </div>
+                    <div class="status-indicators">
+                        <span class="dot green"></span>
+                        <span class="dot yellow"></span>
+                        <span class="dot red"></span>
+                    </div>
+                </div>
+            </header>
+
+            <section id="alerts" class="panel">
+                <div class="panel-header">
+                    <div>
+                        <h2>Menu de Avisos</h2>
+                        <p class="subtitle">Alertas críticos de rede com filtros por prioridade.</p>
+                    </div>
+                    <div class="actions">
+                        <select id="alertFilter" aria-label="Filtro de prioridade">
+                            <option value="all">Todas prioridades</option>
+                            <option value="high">Alta</option>
+                            <option value="medium">Média</option>
+                            <option value="low">Baixa</option>
+                        </select>
+                        <button id="markAllRead" class="secondary">Marcar tudo como lido</button>
+                    </div>
+                </div>
+                <div class="alert-grid">
+                    {% for alert in alerts %}
+                    <article class="alert-card" data-severity="{{ alert.severity }}">
+                        <header>
+                            <div class="badge {{ alert.severity }}"></div>
+                            <div>
+                                <h3>{{ alert.title }}</h3>
+                                <p class="timestamp">{{ alert.timestamp|date:'d/m/Y H:i' }}</p>
+                            </div>
+                            <button class="mark-read" aria-label="Marcar como lido">
+                                <i class="fa-solid fa-check"></i>
+                            </button>
+                        </header>
+                        <p class="description">{{ alert.description }}</p>
+                    </article>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <section id="manuals" class="panel hidden">
+                <div class="panel-header">
+                    <div>
+                        <h2>Menu de Manuais</h2>
+                        <p class="subtitle">Procedimentos Operacionais Padrão e diagramas.</p>
+                    </div>
+                    <div class="actions">
+                        <input id="manualSearch" type="search" placeholder="Buscar por título ou categoria" aria-label="Buscar manuais" />
+                        <button class="secondary" id="openDocs">Abrir visão estilo documentação</button>
+                    </div>
+                </div>
+                <div class="manuals-grid">
+                    {% for manual in manuals %}
+                    <section class="manual-category" data-category="{{ manual.category }}">
+                        <header>
+                            <h3>{{ manual.category }}</h3>
+                            <span class="pill">{{ manual.items|length }} docs</span>
+                        </header>
+                        <ul>
+                            {% for item in manual.items %}
+                            <li data-title="{{ item.title }}" data-format="{{ item.format }}">
+                                <div>
+                                    <i class="fa-regular fa-file-{{ 'pdf' if item.format == 'pdf' else 'lines' }}"></i>
+                                    <span>{{ item.title }}</span>
+                                </div>
+                                <button class="view-btn">Visualizar {{ item.format|upper }}</button>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </section>
+                    {% endfor %}
+                </div>
+                <div class="viewer" role="region" aria-live="polite">
+                    <h4>Visualizador embutido</h4>
+                    <p>Selecione um manual para pré-visualizar (PDF/Markdown simulados).</p>
+                    <div id="viewerContent" class="viewer-content">
+                        <p class="placeholder">Nenhum documento selecionado.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="tasks" class="panel hidden">
+                <div class="panel-header">
+                    <div>
+                        <h2>Tarefas Diárias</h2>
+                        <p class="subtitle">Checklist com salvamento em localStorage.</p>
+                    </div>
+                    <div class="actions">
+                        <button id="resetTasks" class="secondary">Resetar progresso</button>
+                    </div>
+                </div>
+                <div class="progress">
+                    <div class="progress-bar" id="taskProgress"></div>
+                    <span id="progressLabel">0% das rotinas concluídas</span>
+                </div>
+                <ul class="tasks-list">
+                    {% for task in tasks %}
+                    <li>
+                        <label>
+                            <input type="checkbox" data-task-key="{{ task.key }}" />
+                            <span>{{ task.title }}</span>
+                        </label>
+                        <button class="secondary small" data-shortcut="{{ forloop.counter }}">Ctrl+{{ forloop.counter }}</button>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </section>
+        </main>
+    </div>
+
+    <script src="{% static 'dashboard/dashboard.js' %}"></script>
+</body>
+</html>

@@ -95,3 +95,14 @@ Exemplo de resposta:
     "err": "Credenciais inválidas!"
 }
 ```
+
+## Dashboard Web para Gestão de Redes
+
+Este repositório agora inclui um dashboard em Django focado em operações de rede, com modo escuro nativo e módulos de Alert Center, Knowledge Base e Daily Checklist.
+
+### Como executar localmente
+
+1. Crie e ative um ambiente virtual.
+2. Instale as dependências: `pip install -r requirements.txt` (é necessário acesso à internet para baixar o Django).
+3. Execute o servidor de desenvolvimento a partir da pasta `network_dashboard`: `python manage.py runserver`.
+4. Acesse `http://localhost:8000/` para visualizar o dashboard.
